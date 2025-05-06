@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-	startTime := time.Now()
 
 	fmt.Println("Reading File")
 	textfile := "Text.txt"
@@ -20,6 +19,7 @@ func main() {
 		panic(err)
 	}
 	Str := string(FileData)
+	startTime := time.Now()
 	var wg sync.WaitGroup
 	wg.Add(9)
 	go separate.WordCounter(Str, &wg)
@@ -36,22 +36,18 @@ func main() {
 	fmt.Println("Time Taken After Using Goroutine: ", timeTaken)
 	fmt.Printf("\n")
 
-	
-
 	startTime2 := time.Now()
 	ch := make(chan []int)
-	var names = [10]string{"Word Count", "Spaces", "Lines", "Sentences", "Paragraphs", "Punctuations", "Special Characters", "Vowels", "Consonants", "Digits"}
+	var names = [9]string{"Word Count", "Lines", "Sentences", "Paragraphs", "Punctuations", "Special Characters", "Vowels", "Consonants", "Digits"}
 	go combo.Combo(Str, ch)
 	value := <-ch
 	for i := 0; i < 9; i++ {
-		
+
 		fmt.Println(names[i], value[i])
 
 	}
 	timeTaken2 := time.Since(startTime2)
 	fmt.Println("Time Taken After Using Channels & Goroutines: ", timeTaken2)
-
-
 
 	startTime3 := time.Now()
 	chunks.Chunks(Str)

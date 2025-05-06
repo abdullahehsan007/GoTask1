@@ -29,7 +29,6 @@ func Combo(fileData string, ch chan<- []int) {
 				sentences++
 
 			}
-
 			punctuations++
 		case '!', '@', '#', '$', '%', '^', '&', '*',
 			'(', ')', '[', ']', '{', '}', '+', '=', '-',
@@ -54,6 +53,7 @@ func Combo(fileData string, ch chan<- []int) {
 		}
 
 	}
+	
 	result:= []int{
 		wordCount,lines,sentences,paragraphs,punctuations,specialChar,vowelscount,consonants,digits,
 	}
