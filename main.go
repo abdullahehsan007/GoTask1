@@ -1,6 +1,7 @@
 package main
 
 import (
+	"GOTASK/chunks"
 	"GOTASK/combo"
 	"GOTASK/separate"
 	"fmt"
@@ -13,7 +14,7 @@ func main() {
 	startTime := time.Now()
 
 	fmt.Println("Reading File")
-	textfile := "Test.txt"
+	textfile := "Text.txt"
 	FileData, err := os.ReadFile(textfile)
 	if err != nil {
 		panic(err)
@@ -32,18 +33,28 @@ func main() {
 	go separate.DigitsCounter(Str, &wg)
 	wg.Wait()
 	timeTaken := time.Since(startTime)
-
 	fmt.Println("Time Taken After Using Goroutine: ", timeTaken)
-	startTime2 := time.Now()
+	fmt.Printf("\n")
 
-	ch := make(chan int, 10)
+	
+
+	startTime2 := time.Now()
+	ch := make(chan []int)
 	var names = [10]string{"Word Count", "Spaces", "Lines", "Sentences", "Paragraphs", "Punctuations", "Special Characters", "Vowels", "Consonants", "Digits"}
 	go combo.Combo(Str, ch)
+	value := <-ch
 	for i := 0; i < 9; i++ {
-		value := <-ch
-		fmt.Println(names[i], value)
+		
+		fmt.Println(names[i], value[i])
 
 	}
 	timeTaken2 := time.Since(startTime2)
 	fmt.Println("Time Taken After Using Channels & Goroutines: ", timeTaken2)
+
+
+
+	startTime3 := time.Now()
+	chunks.Chunks(Str)
+	timeTaken3 := time.Since(startTime3)
+	fmt.Println("Time Taken After Using Chunks: ", timeTaken3)
 }

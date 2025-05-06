@@ -1,6 +1,6 @@
 package combo
 
-func Combo(fileData string, ch chan<- int) {
+func Combo(fileData string, ch chan<- []int) {
 	var wordCount int = 0
 	var lines int = 1
 	var sentences int = 0
@@ -52,16 +52,21 @@ func Combo(fileData string, ch chan<- int) {
 				digits++
 			}
 		}
+
 	}
-	ch <- wordCount
-	ch <- lines
-	ch <- sentences
-	ch <- paragraphs
-	ch <- punctuations
-	ch <- specialChar
-	ch <- vowelscount
-	ch <- consonants
-	ch <- digits
-	defer close(ch)
+	result:= []int{
+		wordCount,lines,sentences,paragraphs,punctuations,specialChar,vowelscount,consonants,digits,
+	}
+	ch<-result
+	// ch <- wordCount
+	// ch <- lines
+	// ch <- sentences
+	// ch <- paragraphs
+	// ch <- punctuations
+	// ch <- specialChar
+	// ch <- vowelscount
+	// ch <- consonants
+	// ch <- digits
+//	defer close(ch)
 
 }
