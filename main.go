@@ -3,6 +3,7 @@ package main
 import (
 	"GOTASK/chunks"
 	"GOTASK/combo"
+	"GOTASK/database"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 )
 
 func main() {
-
+	database.Database()
 	fmt.Println("Reading File")
 	router := gin.Default()
 	router.POST("/analyze", func(ctx *gin.Context) {
