@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"GOTASK/model"
 	"GOTASK/services"
 	"fmt"
 	"net/http"
@@ -10,24 +11,20 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type persons struct {
-	Email    string `json: "email"`
-	Password string `json: "password"`
-}
 
 func Login(db *sqlx.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var entry persons
+		var entry model.User
+		var checkpass string
+		var name string
+		var user model.Info
 
 		if err := ctx.ShouldBindJSON(&entry); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Data not in JSON"})
 			return
 		}
-		var checkpass string
-		var name string
 
-		err := db.QueryRow(
-			`SELECT username, password FROM signup WHERE email = $1 `,
+		err := db.QueryRow(`SELECT username, password FROM signup WHERE email = $1 `,
 			entry.Email).Scan(&name, &checkpass)
 
 		if err != nil {
@@ -38,7 +35,7 @@ func Login(db *sqlx.DB) gin.HandlerFunc {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Password"})
 			return
 		}
-		tokenString,refresh,err := services.CreateToken(entry.Email)
+		tokenString, refresh, err := services.CreateToken(user.Id)
 		if err != nil {
 			fmt.Errorf("No username found")
 		}
@@ -48,9 +45,9 @@ func Login(db *sqlx.DB) gin.HandlerFunc {
 		// 	return
 		// }
 		ctx.JSON(http.StatusCreated, gin.H{
-			"message": "Login Successful",
-			"user":    name,
-			"Token":   tokenString,
+			"message":       "Login Successful",
+			"user":          name,
+			"Token":         tokenString,
 			"Refresh Token": refresh,
 		})
 	}
