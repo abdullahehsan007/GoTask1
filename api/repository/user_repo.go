@@ -1,4 +1,4 @@
-package api
+package repository
 
 import (
 	"GOTASK/model"
@@ -7,27 +7,63 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type UserRepository interface {
+	GetUser(email string) (bool, error)
+	CreateUser(user model.Info) error
+	GetId(email string) (string, error)
+	GetUserData(email string) (string, string, error)
+}
+type UserRepo struct {
+	db *sqlx.DB
+}
+
+func NewUserRepository(db *sqlx.DB) UserRepository {
+	return &UserRepo{db: db}
+}
+
 func HashedPassword(User model.Info) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(User.Password), bcrypt.DefaultCost)
 	return string(hashed), err
 }
 
-func GetUser(db *sqlx.DB, username, email string) (bool, error) {
+func (r *UserRepo)GetId(email string) (string, error) {
+	var id string
+	query := `SELECT id FROM signup WHERE email = $1`
+	err := r.db.QueryRow(query, email).Scan(&id)
+	if err != nil {
+		return "", err
+	}
+	return id, nil
+}
+
+func (r *UserRepo)GetUser(email string) (bool, error) {
 	var exists bool
-	query := `SELECT EXISTS(SELECT 1 FROM signup WHERE username = $1 OR email = $2)`
-	err := db.QueryRow(query, username, email).Scan(&exists)
+	query := `SELECT EXISTS(SELECT 1 FROM signup WHERE email = $1)`
+	err := r.db.QueryRow(query, email).Scan(&exists)
 	if err != nil {
 		return false, err
 	}
+
 	return exists, nil
 }
 
-func CreateUser(db *sqlx.DB, user model.Info) error {
+func (r *UserRepo)GetUserData(email string) (string, string, error) {
+	var id string
+	var dbpass string
+	query := `SELECT id,password FROM signup WHERE email = $1`
+	err := r.db.QueryRow(query, email).Scan(&id, &dbpass)
+	if err != nil {
+		return "", "", err
+	}
+	return id, dbpass, nil
+}
+
+func (r *UserRepo)CreateUser(user model.Info) error {
 	hashed, err := HashedPassword(user)
 	if err != nil {
 		return err
 	}
-    query:= `INSERT INTO signup(username,email,password) VALUES($1,$2,$3) RETURNING id `
-	_,err = db.Exec(query, user.Username, user.Email, hashed)
+	query := `INSERT INTO signup(username,email,password) VALUES($1,$2,$3) RETURNING id `
+	_, err = r.db.Exec(query, user.Username, user.Email, hashed)
 	return err
 }

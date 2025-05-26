@@ -1,24 +1,55 @@
 package services
 
 import (
-	api "GOTASK/api/repository"
+	"GOTASK/api/repository"
 	"GOTASK/model"
 	"errors"
+	"fmt"
 	"regexp"
 
-	"github.com/jmoiron/sqlx"
+	"golang.org/x/crypto/bcrypt"
 )
+
+type AuthService interface {
+	Authenticator(credential model.User) (string, error)
+	RegisterUser(user model.Info) error
+}
+
+type authService struct {
+	repo repository.UserRepository
+}
+
+func NewAuthService(repo repository.UserRepository) AuthService {
+	return &authService{repo: repo}
+}
 
 func IsValidGmail(email string) bool {
 	valid := regexp.MustCompile(`^[^@]+@gmail\.com$`)
 	return valid.MatchString(email)
 }
-
-func RegisterUser(db *sqlx.DB, user model.Info) error {
-	exists, err := api.GetUser(db, user.Username, user.Email)
+func (r *authService) Authenticator(credential model.User) (string, error) {
+	exist, err := r.repo.GetUser(credential.Email)
+	if err != nil {
+		return "", err
+	}
+	if !exist {
+		return "", fmt.Errorf("user not found")
+	}
+	id, pass, err := r.repo.GetUserData(credential.Email)
+	if err != nil {
+		return "", err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(pass), []byte(credential.Password))
+	if err != nil {
+		return "", fmt.Errorf("incorrect password")
+	}
+	return id, err
+}
+func (r *authService) RegisterUser(user model.Info) error {
+	exists, err := r.repo.GetUser(user.Email)
 	if err == nil && exists {
 		return errors.New("user already exists")
 	}
 
-	return api.CreateUser(db, user)
+	return r.repo.CreateUser(user)
 }
