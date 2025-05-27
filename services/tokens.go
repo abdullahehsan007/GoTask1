@@ -48,7 +48,7 @@ func VerifyToken(tokenString string) error {
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("Token Expired")
+		return fmt.Errorf("token expired")
 	}
 
 	return nil
