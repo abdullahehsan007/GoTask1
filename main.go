@@ -15,12 +15,12 @@ func main() {
 	db := database.Database()
 	//for signup (dependencies)
 	userRepo := repository.NewUserRepository(db)
-	userService := signup.NewUserService(userRepo)
+	userService := services.NewUserService(userRepo)
 	userHandler := signup.NewUserHandler(userService)
 
 	//for login
-	authService := services.NewAuthService(userRepo)
-	loginservice := login.NewAuthService(userRepo, authService)
+	//authService := services.NewAuthService(userRepo)
+	loginservice := services.NewAuthService(userRepo)
 	loginHandler := login.NewLoginHandler(loginservice)
 
 	defer db.Close()

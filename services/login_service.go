@@ -13,6 +13,7 @@ import (
 type AuthService interface {
 	Authenticator(credential model.User) (string, error)
 	RegisterUser(user model.Info) error
+	Login(email, password string) (string, error)
 }
 
 type authService struct {
@@ -26,6 +27,19 @@ func NewAuthService(repo repository.UserRepository) AuthService {
 func IsValidGmail(email string) bool {
 	valid := regexp.MustCompile(`^[^@]+@gmail\.com$`)
 	return valid.MatchString(email)
+}
+func (r *authService) Login(email, password string) (string, error) {
+	// var l AuthService
+	// id, err := l.Authenticator(model.User{Email: email,
+	// 	Password: password})
+	// if err != nil {
+	// 	return "", err
+	// }
+	// return id, nil
+	return r.Authenticator(model.User{
+		Email:    email,
+		Password: password,
+	})
 }
 func (r *authService) Authenticator(credential model.User) (string, error) {
 	exist, err := r.repo.GetUser(credential.Email)
@@ -52,4 +66,5 @@ func (r *authService) RegisterUser(user model.Info) error {
 	}
 
 	return r.repo.CreateUser(user)
+
 }

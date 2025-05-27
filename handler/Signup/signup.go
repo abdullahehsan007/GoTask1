@@ -2,16 +2,17 @@ package signup
 
 import (
 	"GOTASK/model"
+	"GOTASK/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
-	service UserService
+	service services.UserService
 }
 
-func NewUserHandler(service UserService) *UserHandler {
+func NewUserHandler(service services.UserService) *UserHandler {
 	return &UserHandler{service: service}
 }
 
