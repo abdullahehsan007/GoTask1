@@ -1,21 +1,22 @@
 package routes
 
 import (
-	analyzer "GOTASK/handler/Analyzer"
-	authorization "GOTASK/handler/Authorization"
-	login "GOTASK/handler/Login"
-	refreshtoken "GOTASK/handler/RefreshToken"
-	signup "GOTASK/handler/Signup"
+
+	// analyzer "GOTASK/handler/Analyzer"
+	// authorization "GOTASK/handler/Authorization"
+
+	"GOTASK/handler"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 )
 
-func RoutersSetup(router *gin.Engine, db *sqlx.DB, userHandler *signup.UserHandler, loginHandler *login.LoginHandler) {
-	router.POST("/analyze", authorization.Authorize(), analyzer.AnalyzeText(db))
-	router.POST("/signup", userHandler.Signup)
-	router.POST("/login",loginHandler.Login)
-	router.POST("/auth", authorization.Authorize())
-	router.POST("/ref", refreshtoken.Refresh(db))
+func RoutersSetup(router *gin.Engine, db *sqlx.DB) {
+	handlers := handler.NewUserHandler(db)
+	router.POST("/analyze", handlers.Authorize(), handler.AnalyzeText(db))
+	router.POST("/signup", handlers.Signup())
+	router.POST("/login", handlers.Login())
+	router.POST("/auth", handlers.Authorize())
+	router.POST("/ref", handlers.Refresh())
 	router.Run(":8080")
 }

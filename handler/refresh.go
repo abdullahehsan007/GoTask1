@@ -1,4 +1,4 @@
-package refreshtoken
+package handler
 
 import (
 	"GOTASK/services"
@@ -6,10 +6,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
 )
 
-func Refresh(db *sqlx.DB) gin.HandlerFunc {
+func (h *userHandler) Refresh() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		refreshToken := ctx.PostForm("r_token")
 		if refreshToken == "" {
@@ -23,14 +22,14 @@ func Refresh(db *sqlx.DB) gin.HandlerFunc {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired refresh token"})
 			return
 		}
-		newAccessToken,_,err:= services.CreateToken(email)
-        if err != nil {
+		newAccessToken, _, err := services.CreateToken(email)
+		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Could not generate new token"})
 			return
 		}
-		
-	     ctx.JSON(http.StatusCreated, gin.H{
-			"Message": "Access Token Generated",
+
+		ctx.JSON(http.StatusCreated, gin.H{
+			"Message":      "Access Token Generated",
 			"Access Token": newAccessToken,
 		})
 

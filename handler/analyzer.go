@@ -1,7 +1,7 @@
-package analyzer
+package handler
 
 import (
-	api "GOTASK/api/repository"
+	"GOTASK/api"
 	"GOTASK/services"
 	"io"
 	"net/http"
@@ -25,7 +25,7 @@ func AnalyzeText(db *sqlx.DB) gin.HandlerFunc {
 
 		result, timeTaken := services.TextAnalysis(text)
 
-		err = api.Result(db, file.Filename, result, timeTaken.String())
+		err = api.Result(db,file.Filename, result, timeTaken.String())
 		if err != nil {
 			c.String(http.StatusInternalServerError, "error saving to database: %v", err)
 			return

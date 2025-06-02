@@ -3,30 +3,14 @@ package repository
 import (
 	"GOTASK/model"
 
-	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type UserRepository interface {
-	GetUser(email string) (bool, error)
-	CreateUser(user model.Info) error
-	GetId(email string) (string, error)
-	GetUserData(email string) (string, string, error)
-}
-type UserRepo struct {
-	db *sqlx.DB
-}
-
-func NewUserRepository(db *sqlx.DB) UserRepository {
-	return &UserRepo{db: db}
-}
-
 func HashedPassword(User model.Info) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(User.Password), bcrypt.DefaultCost)
 	return string(hashed), err
 }
 
-func (r *UserRepo)GetId(email string) (string, error) {
+func (r *UserRepo) GetId(email string) (string, error) {
 	var id string
 	query := `SELECT id FROM signup WHERE email = $1`
 	err := r.db.QueryRow(query, email).Scan(&id)
@@ -36,7 +20,7 @@ func (r *UserRepo)GetId(email string) (string, error) {
 	return id, nil
 }
 
-func (r *UserRepo)GetUser(email string) (bool, error) {
+func (r *UserRepo) GetUser(email string) (bool, error) {
 	var exists bool
 	query := `SELECT EXISTS(SELECT 1 FROM signup WHERE email = $1)`
 	err := r.db.QueryRow(query, email).Scan(&exists)
@@ -47,7 +31,7 @@ func (r *UserRepo)GetUser(email string) (bool, error) {
 	return exists, nil
 }
 
-func (r *UserRepo)GetUserData(email string) (string, string, error) {
+func (r *UserRepo) GetUserData(email string) (string, string, error) {
 	var id string
 	var dbpass string
 	query := `SELECT id,password FROM signup WHERE email = $1`
@@ -58,7 +42,7 @@ func (r *UserRepo)GetUserData(email string) (string, string, error) {
 	return id, dbpass, nil
 }
 
-func (r *UserRepo)CreateUser(user model.Info) error {
+func (r *UserRepo) CreateUser(user model.Info) error {
 	hashed, err := HashedPassword(user)
 	if err != nil {
 		return err

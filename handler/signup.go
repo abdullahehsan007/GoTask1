@@ -1,22 +1,16 @@
-package signup
+package handler
 
 import (
 	"GOTASK/model"
-	"GOTASK/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type UserHandler struct {
-	service services.UserService
-}
 
-func NewUserHandler(service services.UserService) *UserHandler {
-	return &UserHandler{service: service}
-}
 
-func (h *UserHandler) Signup(ctx *gin.Context) {
+func (h *userHandler) Signup() gin.HandlerFunc{
+	return func(ctx *gin.Context){
 	var user model.Info
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -35,4 +29,5 @@ func (h *UserHandler) Signup(ctx *gin.Context) {
 		"message": "User registered!",
 		"user":    user.Username,
 	})
+}
 }

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"GOTASK/api/repository"
 	"GOTASK/model"
 	"errors"
 	"fmt"
@@ -10,25 +9,25 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthService interface {
-	Authenticator(credential model.User) (string, error)
-	RegisterUser(user model.Info) error
-	Login(email, password string) (string, error)
-}
+// type AuthService interface {
+// 	Authenticator(credential model.User) (string, error)
+// 	RegisterUser(user model.Info) error
+// 	Login(email, password string) (string, error)
+// }
 
-type authService struct {
-	repo repository.UserRepository
-}
+// type authService struct {
+// 	repo repository.UserRepository
+// }
 
-func NewAuthService(repo repository.UserRepository) AuthService {
-	return &authService{repo: repo}
-}
+// func NewAuthService(repo repository.UserRepository) AuthService {
+// 	return &authService{repo: repo}
+// }
 
 func IsValidGmail(email string) bool {
 	valid := regexp.MustCompile(`^[^@]+@gmail\.com$`)
 	return valid.MatchString(email)
 }
-func (r *authService) Login(email, password string) (string, error) {
+func (r *authservice) Login(email, password string) (string, error) {
 	// var l AuthService
 	// id, err := l.Authenticator(model.User{Email: email,
 	// 	Password: password})
@@ -41,7 +40,7 @@ func (r *authService) Login(email, password string) (string, error) {
 		Password: password,
 	})
 }
-func (r *authService) Authenticator(credential model.User) (string, error) {
+func (r *authservice) Authenticator(credential model.User) (string, error) {
 	exist, err := r.repo.GetUser(credential.Email)
 	if err != nil {
 		return "", err
@@ -59,7 +58,7 @@ func (r *authService) Authenticator(credential model.User) (string, error) {
 	}
 	return id, err
 }
-func (r *authService) RegisterUser(user model.Info) error {
+func (r *authservice) RegisterUser(user model.Info) error {
 	exists, err := r.repo.GetUser(user.Email)
 	if err == nil && exists {
 		return errors.New("user already exists")

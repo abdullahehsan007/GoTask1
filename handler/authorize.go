@@ -1,4 +1,4 @@
-package authorization
+package handler
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ func TokenType(token *jwt.Token, Type string) bool {
 	return false
 }
 
-func Authorize() gin.HandlerFunc {
+func (h *userHandler) Authorize() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := BearerToken(ctx.GetHeader("Authorization"))
 		if token == "" {
@@ -49,7 +49,9 @@ func Authorize() gin.HandlerFunc {
 			ctx.Next()
 			return
 		}
-
+		if err != nil {
+			fmt.Println("Error:", err)
+		}
 		token2, err = ParseToken(token, refreshSecretKey)
 		if err == nil {
 			if TokenType(token2, "refresh") {
